@@ -1,4 +1,4 @@
-#include "main.h"
+#include "monty.h"
 /**
  * _atoi - atoi
  * @s: string input
