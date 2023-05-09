@@ -41,6 +41,7 @@ typedef struct instruction_s
 void _pall(stack_t **stack, unsigned int line_number);
 void _push(stack_t **stack, unsigned int line_number);
 int _atoi(char *s);
+void free_list(stack_t *head);
 
 /**
  * get_function - Function for getting the apropiate function
