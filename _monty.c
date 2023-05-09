@@ -27,11 +27,11 @@ int main(int argc, char *argv[])
 
 	while (getline(&line, &len, file) != -1)
 	{
-		strtoker = strtok(line, " /t/n$");
-		if (strcmp(line, "\n") != 0)
+		strtoker = strtok(line, " \t");
+		if (strcmp(strtoker, "\n") != 0)
 		{
 			_opcode = strdup(strtoker);
-			strtoker = strtok(NULL, " /t/n$");
+			strtoker = strtok(NULL, " \t");
 			f = get_function(strtoker, _opcode, line_counter, &error_flag);
 			if (error_flag == 1)
 			{
@@ -69,14 +69,15 @@ void (*get_function(char *number, char *_opcode, int line_count, int *error))(
 		{"pall", _pall},
 		{NULL, NULL}
 	};
-
+	strtok(_opcode, " \n");
 	while (operators[count].opcode != NULL)
 	{
 		if (strcmp(operators[count].opcode, _opcode) == 0)
 		{
 			if (number && strcmp(_opcode, "push") == 0)
 			{
-				if ((!atoi(number) && number[0] - '0' != 0))
+				number = _digit_checker(number);
+				if ((!number))
 				{
 					fprintf(stderr, "%s%d%s", "L", line_count, ": usage: push integer\n");
 					*error = 1;
@@ -91,4 +92,18 @@ void (*get_function(char *number, char *_opcode, int line_count, int *error))(
 	 line_count, ": unknown instruction ", _opcode, '\n');
 	*error = 1;
 	return (NULL);
+}
+
+char *_digit_checker(char *number)
+{
+	int counter = 0;
+	while (number[counter])
+	{
+		strtok(number, " \n");
+		if (isdigit(number[counter]) == 0 && number[counter] != '-')
+			return (NULL);
+		counter++;
+	}
+
+	return (number);
 }
