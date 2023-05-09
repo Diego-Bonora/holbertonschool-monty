@@ -10,17 +10,15 @@
 int main(int argc, char *argv[])
 {
 	FILE *file;
-	char *line = NULL, *_opcode = NULL, *strtoker = NULL, *dup_line = NULL;
+	char *line = NULL, *_opcode = NULL, *strtoker = NULL;
 	size_t len = 0;
 	stack_t *stack = NULL;
 	void (*f)(stack_t **stack, unsigned int line_number);
-	int line_counter = 1;
+	int line_counter = 1, error_flag = 0;
 
 	if (argc != 2)
 	{	fprintf(stderr, "%s", "USAGE: monty file\n");
 		exit(EXIT_FAILURE); }
-
-	stack = NULL;
 
 	file = fopen(argv[1], "r");
 	if (!file)
@@ -29,24 +27,26 @@ int main(int argc, char *argv[])
 
 	while (getline(&line, &len, file) != -1)
 	{
-		dup_line = strdup(line);
-		strtoker = strtok(dup_line, " /t/n$");
-		if (strcmp(line, "\n") == 0)
-			continue;
-		_opcode = strdup(strtoker);
-		strtoker = strtok(NULL, " /t/n$");
-		f = get_function(strtoker, _opcode, line_counter);
-		if (strtoker)
-			f(&stack, atoi(strtoker));
-		else
-			f(&stack, 0);
-		free(_opcode);
-		free(dup_line);
+		strtoker = strtok(line, " /t/n$");
+		if (strcmp(line, "\n") != 0)
+		{
+			_opcode = strdup(strtoker);
+			strtoker = strtok(NULL, " /t/n$");
+			f = get_function(strtoker, _opcode, line_counter, &error_flag);
+			if (error_flag == 1)
+			{
+				free(_opcode), free(line), fclose(file), free_list(stack);
+				exit(EXIT_FAILURE);
+			}
+			if (strtoker)
+				f(&stack, atoi(strtoker));
+			else
+				f(&stack, 0);
+			free(_opcode);
+		}
 		line_counter++;
 	}
-	free(line);
-	fclose(file);
-	free_list(stack);
+	free(line), fclose(file), free_list(stack);
 	return (0);
 }
 
@@ -55,11 +55,12 @@ int main(int argc, char *argv[])
  * @number: line read from the file
  * @_opcode: its the opcode
  * @stack: head node
- * @line_number: number
+ * @line_count: number of line
+ * @line_number: parameter for the function
  * Return: returns a function
  */
 
-void (*get_function(char *number, char *_opcode, int line_count))(
+void (*get_function(char *number, char *_opcode, int line_count, int *error))(
 	stack_t **stack, unsigned int line_number)
 {
 	int count = 0;
@@ -78,13 +79,16 @@ void (*get_function(char *number, char *_opcode, int line_count))(
 				if ((!atoi(number) && number[0] - '0' != 0))
 				{
 					fprintf(stderr, "%s%d%s", "L", line_count, ": usage: push integer\n");
-					exit(EXIT_FAILURE);
+					*error = 1;
+					return (NULL);
 				}
 			}
 			return (operators[count].f);
 		}
 		count++;
 	}
-	fprintf(stderr, "%s%d%s", "L", line_count, ": unknown instruction <opcode>");
-	exit(EXIT_FAILURE);
+	fprintf(stderr, "%s%d%s%s%c", "L",
+	 line_count, ": unknown instruction ", _opcode, '\n');
+	*error = 1;
+	return (NULL);
 }
