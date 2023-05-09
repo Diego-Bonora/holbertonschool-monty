@@ -10,38 +10,38 @@
 int main(int argc, char *argv[])
 {
 	FILE *file;
-	char *line = NULL, *_opcode = NULL;
+	char *line = NULL, *_opcode = NULL, *strtoker = NULL;
 	size_t len = 0;
 	stack_t *stack = NULL;
 	void (*f)(stack_t **stack, unsigned int line_number);
+	int line_counter = 1;
 
 	if (argc != 2)
-	{
-		fprintf(stderr, "%s", "USAGE: monty file");
-		exit(EXIT_FAILURE);
-	}
+	{	fprintf(stderr, "%s", "USAGE: monty file\n");
+		exit(EXIT_FAILURE); }
 
 	stack = malloc(sizeof(stack_t));
 	if (!stack)
-	{
-		fprintf(stderr, "%s", "Error: malloc failed\n");
-		exit(EXIT_FAILURE);
-	}
+	{	fprintf(stderr, "%s", "Error: malloc failed\n");
+		exit(EXIT_FAILURE); }
 	stack = NULL;
 
 	file = fopen(argv[1], "r");
 	if (!file)
-	{
-		fprintf(stderr, "%s%s%c", "Error: Can't open file ", argv[1], '\n');
-		exit(EXIT_FAILURE);
-	}
+	{	fprintf(stderr, "%s%s%c", "Error: Can't open file ", argv[1], '\n');
+		exit(EXIT_FAILURE); }
 
 	while (getline(&line, &len, file) != -1)
 	{
-		_opcode = _get_opcode(line);
-		f = get_function(line, _opcode);
-		f(&stack, _atoi(line));
+		strtoker = strtok(line, " /t/n$");
+		if (strcmp(line, "\n") == 0)
+			continue;
+		_opcode = strdup(strtoker);
+		strtoker = strtok(NULL, " /t/n$");
+		f = get_function(strtoker, _opcode, line_counter);
+		f(&stack, atoi(strtoker));
 		free(_opcode);
+		line_counter++;
 	}
 	fclose(file);
 	return (0);
@@ -77,13 +77,14 @@ char *_get_opcode(char *line)
 
 /**
  * get_function - Function for getting the apropiate function
- * @line: line read from the file
+ * @number: line read from the file
+ * @_opcode: its the opcode
  * @stack: head node
  * @line_number: number
  * Return: returns a function
  */
 
-void (*get_function(char *line, char *_opcode))(
+void (*get_function(char *number, char *_opcode, int line_count))(
 	stack_t **stack, unsigned int line_number)
 {
 	int count = 0;
@@ -97,15 +98,16 @@ void (*get_function(char *line, char *_opcode))(
 	{
 		if (strcmp(operators[count].opcode, _opcode) == 0)
 		{
-			if (!_atoi(line) && strcmp(_opcode, "push") == 0)
+			if ((!atoi(number) && number[0] - '0' != 0)
+			&& strcmp(_opcode, "push") == 0)
 			{
-				fprintf(stderr, "%s%d%s", "L", 50, ": usage: push integer\n");
+				fprintf(stderr, "%s%d%s", "L", line_count, ": usage: push integer\n");
 				exit(EXIT_FAILURE);
 			}
 			return (operators[count].f);
 		}
 		count++;
 	}
-	fprintf(stderr, "%s%d%s", "L", 91, ": unknown instruction <opcode>");
+	fprintf(stderr, "%s%d%s", "L", line_count, ": unknown instruction <opcode>");
 	exit(EXIT_FAILURE);
 }
