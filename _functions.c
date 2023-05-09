@@ -10,6 +10,7 @@
 void _push(stack_t **stack, unsigned int line_number)
 {
 	stack_t *temp = NULL;
+	int num = line_number;
 
 	temp = malloc(sizeof(stack_t));
 	if (!temp)
@@ -20,14 +21,14 @@ void _push(stack_t **stack, unsigned int line_number)
 
 	if (!*stack)
 	{
-		temp->n = line_number;
+		temp->n = num;
 		temp->prev = NULL;
 		temp->next = NULL;
 		*stack = temp;
 	}
 	else
 	{
-		temp->n = line_number;
+		temp->n = num;
 		temp->prev = NULL;
 		temp->next = *stack;
 		(*stack)->prev = temp;
