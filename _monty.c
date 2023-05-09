@@ -39,40 +39,15 @@ int main(int argc, char *argv[])
 		_opcode = strdup(strtoker);
 		strtoker = strtok(NULL, " /t/n$");
 		f = get_function(strtoker, _opcode, line_counter);
-		f(&stack, atoi(strtoker));
+		if (strtoker)
+			f(&stack, atoi(strtoker));
+		else
+			f(&stack, 0);
 		free(_opcode);
 		line_counter++;
 	}
 	fclose(file);
 	return (0);
-}
-
-/**
- * _get_opcode - function for getting the opcode
- * @line: line read from the file
- * Return: returns the opcode found in the line
- */
-
-char *_get_opcode(char *line)
-{
-	int count = 0, total = 0;
-	char *r_opcode = NULL;
-
-	while (line[count] != ' ' && line[count] != '$')
-		count++;
-	total = count;
-	count = 0;
-	r_opcode = malloc(total);
-	if (!r_opcode)
-	{
-		fprintf(stderr, "%s", "Error: malloc failed\n");
-		exit(EXIT_FAILURE);
-	}
-	for (count = 0; count < total; count++)
-	{
-		r_opcode[count] = line[count];
-	}
-	return (r_opcode);
 }
 
 /**
@@ -98,11 +73,13 @@ void (*get_function(char *number, char *_opcode, int line_count))(
 	{
 		if (strcmp(operators[count].opcode, _opcode) == 0)
 		{
-			if ((!atoi(number) && number[0] - '0' != 0)
-			&& strcmp(_opcode, "push") == 0)
+			if (number && strcmp(_opcode, "push") == 0)
 			{
-				fprintf(stderr, "%s%d%s", "L", line_count, ": usage: push integer\n");
-				exit(EXIT_FAILURE);
+				if ((!atoi(number) && number[0] - '0' != 0))
+				{
+					fprintf(stderr, "%s%d%s", "L", line_count, ": usage: push integer\n");
+					exit(EXIT_FAILURE);
+				}
 			}
 			return (operators[count].f);
 		}
