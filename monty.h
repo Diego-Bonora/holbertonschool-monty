@@ -40,7 +40,6 @@ typedef struct instruction_s
 
 void _pall(stack_t **stack, unsigned int line_number);
 void _push(stack_t **stack, unsigned int line_number);
-char *_get_opcode(char *line);
 int _atoi(char *s);
 
 /**
