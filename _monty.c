@@ -94,9 +94,16 @@ void (*get_function(char *number, char *_opcode, int line_count, int *error))(
 	return (NULL);
 }
 
+/**
+ * _digit_checker - checks digit by digit if there are any leters in the number
+ * @number: imput number
+ * Return: null if fail
+*/
+
 char *_digit_checker(char *number)
 {
 	int counter = 0;
+
 	while (number[counter])
 	{
 		strtok(number, " \n");
