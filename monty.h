@@ -52,6 +52,6 @@ void free_list(stack_t *head);
  * Return: returns a function
  */
 
-void (*get_function(char *number, char *_opcode, int line_counter))(
+void (*get_function(char *number, char *_opcode, int line_count, int *error))(
 	stack_t **stack, unsigned int line_number);
 #endif
