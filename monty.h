@@ -45,12 +45,13 @@ int _atoi(char *s);
 
 /**
  * get_function - Function for getting the apropiate function
- * @line: line read from the file
+ * @number: line read from the file
+ * @_opcode: its the opcode
  * @stack: head node
  * @line_number: number
  * Return: returns a function
  */
 
-void (*get_function(char *line, char *_opcode))(
+void (*get_function(char *number, char *_opcode, int line_counter))(
 	stack_t **stack, unsigned int line_number);
 #endif
