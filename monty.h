@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <fcntl.h>
+#include <ctype.h>
 
 /**
  * struct stack_s - doubly linked list representation of a stack (or queue)
@@ -42,6 +43,7 @@ void _pall(stack_t **stack, unsigned int line_number);
 void _push(stack_t **stack, unsigned int line_number);
 int _atoi(char *s);
 void free_list(stack_t *head);
+char *_digit_checker(char *numbers);
 
 /**
  * get_function - Function for getting the apropiate function
