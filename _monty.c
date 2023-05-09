@@ -10,7 +10,7 @@
 int main(int argc, char *argv[])
 {
 	FILE *file;
-	char *line = NULL, *_opcode = NULL, *strtoker = NULL;
+	char *line = NULL, *_opcode = NULL, *strtoker = NULL, *dup_line = NULL;
 	size_t len = 0;
 	stack_t *stack = NULL;
 	void (*f)(stack_t **stack, unsigned int line_number);
@@ -20,10 +20,6 @@ int main(int argc, char *argv[])
 	{	fprintf(stderr, "%s", "USAGE: monty file\n");
 		exit(EXIT_FAILURE); }
 
-	stack = malloc(sizeof(stack_t));
-	if (!stack)
-	{	fprintf(stderr, "%s", "Error: malloc failed\n");
-		exit(EXIT_FAILURE); }
 	stack = NULL;
 
 	file = fopen(argv[1], "r");
@@ -33,7 +29,8 @@ int main(int argc, char *argv[])
 
 	while (getline(&line, &len, file) != -1)
 	{
-		strtoker = strtok(line, " /t/n$");
+		dup_line = strdup(line);
+		strtoker = strtok(dup_line, " /t/n$");
 		if (strcmp(line, "\n") == 0)
 			continue;
 		_opcode = strdup(strtoker);
@@ -44,9 +41,12 @@ int main(int argc, char *argv[])
 		else
 			f(&stack, 0);
 		free(_opcode);
+		free(dup_line);
 		line_counter++;
 	}
+	free(line);
 	fclose(file);
+	free_list(stack);
 	return (0);
 }
 
