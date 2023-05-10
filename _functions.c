@@ -58,3 +58,24 @@ void _pall(stack_t **stack, unsigned int line_number)
 		}
 	}
 }
+
+/**
+ * _digit_checker - checks digit by digit if there are any leters in the number
+ * @number: imput number
+ * Return: null if fail
+*/
+
+char *_digit_checker(char *number)
+{
+	int counter = 0;
+
+	while (number[counter])
+	{
+		strtok(number, " \n");
+		if (isdigit(number[counter]) == 0 && number[counter] != '-')
+			return (NULL);
+		counter++;
+	}
+
+	return (number);
+}
