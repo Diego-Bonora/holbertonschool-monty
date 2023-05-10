@@ -21,15 +21,12 @@ int main(int argc, char *argv[])
 	if (argc != 2)
 	{	fprintf(stderr, "%s", "USAGE: monty file\n");
 		exit(EXIT_FAILURE); }
-
 	file = fopen(argv[1], "r");
 	if (!file)
 	{	fprintf(stderr, "Error: Can't open file %s\n", argv[1]);
 		exit(EXIT_FAILURE); }
-
 	while (getline(&line, &len, file) != -1)
-	{
-		strtoker = strtok(line, " \t");
+	{	strtoker = strtok(line, " \t");
 		if (strcmp(strtoker, "\n") != 0)
 		{	_opcode = strdup(strtoker);
 			strtoker = strtok(NULL, " \t");
@@ -45,6 +42,8 @@ int main(int argc, char *argv[])
 			{	fprintf(stderr, "L%d: can't pint, stack empty\n", line_counter); }
 			else if (error_flag == 2)
 			{	fprintf(stderr, "L%d: can't pop an empty stack\n", line_counter); }
+			else if (error_flag == 3)
+			{	fprintf(stderr, "L%d: can't swap, stack too short\n", line_counter); }
 			if (error_flag != 0)
 			{	free(_opcode), free(line), fclose(file), free_list(stack);
 				exit(EXIT_FAILURE); }
@@ -103,5 +102,31 @@ void _pop(stack_t **stack, unsigned int line_number)
 	else
 	{
 		error_flag = 2;
+	}
+}
+
+/**
+ * _swap - swaps the top element of the stack
+ * @stack: head node
+ * @line_number: parameter for the function
+ * Return: nothing
+*/
+
+void _swap(stack_t **stack, unsigned int line_number)
+{
+	stack_t *temp = NULL;
+	unsigned int num_changer = 0;
+
+	(void)line_number;
+	if (*stack && (*stack)->next)
+	{
+		temp = (*stack)->next;
+		num_changer = (*stack)->n;
+		(*stack)->n = temp->n;
+		temp->n = num_changer;
+	}
+	else
+	{
+		error_flag = 3;
 	}
 }
