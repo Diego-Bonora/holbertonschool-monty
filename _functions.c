@@ -100,6 +100,8 @@ void (*get_function(char *number, char *_opcode, int line_count, int *error))(
 		{"pint", _pint},
 		{"pop", _pop},
 		{"swap", _swap},
+		{"nop", _nop},
+		{"add", _add},
 		{NULL, NULL}
 	};
 	strtok(_opcode, " \n");
@@ -124,4 +126,17 @@ void (*get_function(char *number, char *_opcode, int line_count, int *error))(
 	fprintf(stderr, "L%d: unknown instruction %s\n", line_count, _opcode);
 	*error = 1;
 	return (NULL);
+}
+
+/**
+ * _nop - function for doing nothing
+ * @stack: head node of the stack
+ * @line_number: unnesesary variable
+ * Return: nothing
+ */
+
+void _nop(stack_t **stack, unsigned int line_number)
+{
+	(void)stack;
+	(void)line_number;
 }
