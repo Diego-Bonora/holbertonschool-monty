@@ -99,6 +99,7 @@ void (*get_function(char *number, char *_opcode, int line_count, int *error))(
 		{"pall", _pall},
 		{"pint", _pint},
 		{"pop", _pop},
+		{"swap", _swap},
 		{NULL, NULL}
 	};
 	strtok(_opcode, " \n");
