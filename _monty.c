@@ -1,5 +1,7 @@
 #include "monty.h"
 
+int error_flag = 0;
+
 /**
  * main - main function for monty
  * @argc: number of arguments
@@ -14,7 +16,7 @@ int main(int argc, char *argv[])
 	size_t len = 0;
 	stack_t *stack = NULL;
 	void (*f)(stack_t **stack, unsigned int line_number);
-	int line_counter = 1, error_flag = 0;
+	int line_counter = 1;
 
 	if (argc != 2)
 	{	fprintf(stderr, "%s", "USAGE: monty file\n");
@@ -29,44 +31,43 @@ int main(int argc, char *argv[])
 	{
 		strtoker = strtok(line, " \t");
 		if (strcmp(strtoker, "\n") != 0)
-		{
-			_opcode = strdup(strtoker);
+		{	_opcode = strdup(strtoker);
 			strtoker = strtok(NULL, " \t");
-			f = get_function(strtoker, _opcode, line_counter, &error_flag);
+			f = get_function(strtoker, _opcode, line_counter);
 			if (error_flag == 1)
-			{
-				free(_opcode), free(line), fclose(file), free_list(stack);
-				exit(EXIT_FAILURE);
-			}
+			{	free(_opcode), free(line), fclose(file), free_list(stack);
+				exit(EXIT_FAILURE); }
 			if (strtoker)
 				f(&stack, atoi(strtoker));
 			else
 				f(&stack, 0);
-			free(_opcode);
-		}
-		line_counter++;
-	}
+			if (error_flag == 1)
+			{	fprintf(stderr, "%s%d%s", "L", line_counter,
+				 ": can't pint, stack empty\n");
+				free(_opcode), free(line), fclose(file), free_list(stack);
+				exit(EXIT_FAILURE); }
+			free(_opcode); }
+		line_counter++; }
 	free(line), fclose(file), free_list(stack);
-	return (0);
-}
+	return (0); }
 
 /**
  * get_function - Function for getting the apropiate function
  * @number: line read from the file
  * @_opcode: its the opcode
  * @stack: head node
- * @line_count: number of line
  * @line_number: parameter for the function
  * Return: returns a function
  */
 
-void (*get_function(char *number, char *_opcode, int line_count, int *error))(
+void (*get_function(char *number, char *_opcode, int line_count))(
 	stack_t **stack, unsigned int line_number)
 {
 	int count = 0;
 	instruction_t operators[] = {
 		{"push", _push},
 		{"pall", _pall},
+		{"pint", _pint},
 		{NULL, NULL}
 	};
 	strtok(_opcode, " \n");
@@ -80,7 +81,7 @@ void (*get_function(char *number, char *_opcode, int line_count, int *error))(
 				if ((!number))
 				{
 					fprintf(stderr, "%s%d%s", "L", line_count, ": usage: push integer\n");
-					*error = 1;
+					error_flag = 1;
 					return (NULL);
 				}
 			}
@@ -90,27 +91,26 @@ void (*get_function(char *number, char *_opcode, int line_count, int *error))(
 	}
 	fprintf(stderr, "%s%d%s%s%c", "L",
 	 line_count, ": unknown instruction ", _opcode, '\n');
-	*error = 1;
+	error_flag = 1;
 	return (NULL);
 }
 
 /**
- * _digit_checker - checks digit by digit if there are any leters in the number
- * @number: imput number
- * Return: null if fail
+ * _pint - prints the head node of the stack
+ * @stack: head node
+ * @line_number: parameter for the function
+ * Return: nothing
 */
 
-char *_digit_checker(char *number)
+void _pint(stack_t **stack, unsigned int line_number)
 {
-	int counter = 0;
-
-	while (number[counter])
+	(void)line_number;
+	if (*stack)
 	{
-		strtok(number, " \n");
-		if (isdigit(number[counter]) == 0 && number[counter] != '-')
-			return (NULL);
-		counter++;
+		printf("%d\n", (*stack)->n);
 	}
-
-	return (number);
+	else
+	{
+		error_flag = 1;
+	}
 }
