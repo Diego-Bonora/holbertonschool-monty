@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
 	file = fopen(argv[1], "r");
 	if (!file)
-	{	fprintf(stderr, "Error: Can't open file %s%c\n", argv[1]);
+	{	fprintf(stderr, "Error: Can't open file %s\n", argv[1]);
 		exit(EXIT_FAILURE); }
 
 	while (getline(&line, &len, file) != -1)
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 		if (strcmp(strtoker, "\n") != 0)
 		{	_opcode = strdup(strtoker);
 			strtoker = strtok(NULL, " \t");
-			f = get_function(strtoker, _opcode, line_counter);
+			f = get_function(strtoker, _opcode, line_counter, &error_flag);
 			if (error_flag == 1)
 			{	free(_opcode), free(line), fclose(file), free_list(stack);
 				exit(EXIT_FAILURE); }
@@ -42,56 +42,16 @@ int main(int argc, char *argv[])
 			else
 				f(&stack, 0);
 			if (error_flag == 1)
-			{	fprintf(stderr, "L%d: can't pint, stack empty\n", line_counter);
-				free(_opcode), free(line), fclose(file), free_list(stack);
+			{	fprintf(stderr, "L%d: can't pint, stack empty\n", line_counter); }
+			else if (error_flag == 2)
+			{	fprintf(stderr, "L%d: can't pop an empty stack\n", line_counter); }
+			if (error_flag != 0)
+			{	free(_opcode), free(line), fclose(file), free_list(stack);
 				exit(EXIT_FAILURE); }
 			free(_opcode); }
 		line_counter++; }
 	free(line), fclose(file), free_list(stack);
 	return (0); }
-
-/**
- * get_function - Function for getting the apropiate function
- * @number: line read from the file
- * @_opcode: its the opcode
- * @stack: head node
- * @line_number: parameter for the function
- * Return: returns a function
- */
-
-void (*get_function(char *number, char *_opcode, int line_count))(
-	stack_t **stack, unsigned int line_number)
-{
-	int count = 0;
-	instruction_t operators[] = {
-		{"push", _push},
-		{"pall", _pall},
-		{"pint", _pint},
-		{NULL, NULL}
-	};
-	strtok(_opcode, " \n");
-	while (operators[count].opcode != NULL)
-	{
-		if (strcmp(operators[count].opcode, _opcode) == 0)
-		{
-			if (number && strcmp(_opcode, "push") == 0)
-			{
-				number = _digit_checker(number);
-				if ((!number))
-				{
-					fprintf(stderr, "L%d: usage: push integer\n", line_count);
-					error_flag = 1;
-					return (NULL);
-				}
-			}
-			return (operators[count].f);
-		}
-		count++;
-	}
-	fprintf(stderr, "L%d: unknown instruction %s\n", line_count, _opcode);
-	error_flag = 1;
-	return (NULL);
-}
 
 /**
  * _pint - prints the head node of the stack
@@ -110,5 +70,38 @@ void _pint(stack_t **stack, unsigned int line_number)
 	else
 	{
 		error_flag = 1;
+	}
+}
+
+/**
+ * _pop - removes the top element of the stack
+ * @stack: head node
+ * @line_number: parameter for the function
+ * Return: nothing
+*/
+
+void _pop(stack_t **stack, unsigned int line_number)
+{
+	stack_t *temp = NULL;
+
+	(void)line_number;
+	if (*stack)
+	{
+		if ((*stack)->next)
+		{
+			temp = *stack;
+			(*stack) = (*stack)->next;
+			(*stack)->prev = NULL;
+			free(temp);
+		}
+		else
+		{
+			free(*stack);
+			*stack = NULL;
+		}
+	}
+	else
+	{
+		error_flag = 2;
 	}
 }
