@@ -38,9 +38,9 @@ typedef struct instruction_s
 		char *opcode;
 		void (*f)(stack_t **stack, unsigned int line_number);
 } instruction_t;
-
 void _pall(stack_t **stack, unsigned int line_number);
 void _push(stack_t **stack, unsigned int line_number);
+void _pint(stack_t **stack, unsigned int line_number);
 int _atoi(char *s);
 void free_list(stack_t *head);
 char *_digit_checker(char *numbers);
@@ -54,6 +54,6 @@ char *_digit_checker(char *numbers);
  * Return: returns a function
  */
 
-void (*get_function(char *number, char *_opcode, int line_count, int *error))(
+void (*get_function(char *number, char *_opcode, int line_count))(
 	stack_t **stack, unsigned int line_number);
 #endif
