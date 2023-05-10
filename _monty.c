@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
 	file = fopen(argv[1], "r");
 	if (!file)
-	{	fprintf(stderr, "%s%s%c", "Error: Can't open file ", argv[1], '\n');
+	{	fprintf(stderr, "Error: Can't open file %s%c\n", argv[1]);
 		exit(EXIT_FAILURE); }
 
 	while (getline(&line, &len, file) != -1)
@@ -42,8 +42,7 @@ int main(int argc, char *argv[])
 			else
 				f(&stack, 0);
 			if (error_flag == 1)
-			{	fprintf(stderr, "%s%d%s", "L", line_counter,
-				 ": can't pint, stack empty\n");
+			{	fprintf(stderr, "L%d: can't pint, stack empty\n", line_counter);
 				free(_opcode), free(line), fclose(file), free_list(stack);
 				exit(EXIT_FAILURE); }
 			free(_opcode); }
@@ -80,7 +79,7 @@ void (*get_function(char *number, char *_opcode, int line_count))(
 				number = _digit_checker(number);
 				if ((!number))
 				{
-					fprintf(stderr, "%s%d%s", "L", line_count, ": usage: push integer\n");
+					fprintf(stderr, "L%d: usage: push integer\n", line_count);
 					error_flag = 1;
 					return (NULL);
 				}
@@ -89,8 +88,7 @@ void (*get_function(char *number, char *_opcode, int line_count))(
 		}
 		count++;
 	}
-	fprintf(stderr, "%s%d%s%s%c", "L",
-	 line_count, ": unknown instruction ", _opcode, '\n');
+	fprintf(stderr, "L%d: unknown instruction %s\n", line_count, _opcode);
 	error_flag = 1;
 	return (NULL);
 }
